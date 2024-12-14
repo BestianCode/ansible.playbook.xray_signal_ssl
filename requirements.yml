@@ -1,0 +1,10 @@
+---
+
+collections:
+  - name: bestiancode.sysadmin
+  - name: bestiancode.nginx_ssl
+
+roles:
+  - name: bestiancode.signal_proxy
+  - name: bestiancode.xray_vpn_server
+  - name: bestiancode.anonymous_proxy

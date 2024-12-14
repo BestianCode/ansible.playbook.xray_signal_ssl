@@ -1,0 +1,8 @@
+ansible_python_interpreter: /usr/bin/python3
+rootGroup: root
+
+usersHomeFolder: /home
+usersDefShell: /bin/bash
+
+mainETC: /etc
+sshServiceName: ssh

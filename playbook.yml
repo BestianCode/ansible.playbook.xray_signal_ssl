@@ -1,0 +1,74 @@
+---
+
+- name: Update Ansible Collections
+  import_playbook: _update-ansible-collections.yml
+
+- hosts:
+    - all
+  become: true
+  tags:
+    - basic
+    - init
+  roles:
+    - bestiancode.sysadmin.initial_setup
+
+- hosts:
+    - all
+  become: true
+  tags:
+    - auth
+    - init
+  roles:
+    - bestiancode.sysadmin.auth_ssh_manager
+
+- hosts:
+    - vpn
+  become: true
+  tags:
+    - vpn
+    - nginx
+  roles:
+    - bestiancode.nginx_ssl.install
+    - bestiancode.nginx_ssl.reload
+    - bestiancode.nginx_ssl.letsencrypt
+    - bestiancode.nginx_ssl.reload
+
+- hosts:
+    - vpn
+  become: true
+  tags:
+    - vpn
+    - signal
+  roles:
+    - bestiancode.signal_proxy
+    - bestiancode.nginx_ssl.reload
+
+- hosts:
+    - vpn
+  become: true
+  tags:
+    - vpn
+    - xray
+  roles:
+    - bestiancode.xray_vpn_server
+
+- hosts:
+    - vpn
+  become: true
+  tags:
+    - vpn
+    - proxy
+    - squid
+  roles:
+    - bestiancode.anonymous_proxy
+
+- hosts:
+    - all
+  become: true
+  tags:
+    - reboot
+    - basic
+    - vpn
+    - init
+  roles:
+    - bestiancode.sysadmin.initial_reboot

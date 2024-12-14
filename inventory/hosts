@@ -1,0 +1,5 @@
+[vpn]
+vpn01 ansible_host=xxx.my.domain ansible_user=root ansible_port=22
+
+[lnx:children]
+vpn

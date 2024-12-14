@@ -1,0 +1,47 @@
+catch_default_80: false
+catch_default_443: false
+
+cloudflare_token: "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+
+signal_port: 443
+
+xray_dns_name: "{{ ansible_host }}"
+xray_ssl_name: "{{ xray_dns_name }}"
+
+letsencrypt_domains:
+#  - { name: "-d *.my.domain",         email: "sysop@my.domain", dns_provider: "cloudflare" }
+  - { name: "-d {{ xray_dns_name }}", email: "sysop@my.domain", dns_provider: "" }
+
+squid_port: 63128
+squid_users:
+  - { user: "user1", password: "ubhriufefriufgh" }
+  - { user: "user2", password: "u5thu3rbfefrujfv" }
+  - { user: "user3", password: "ufberbredcdfcd" }
+
+xray_port: 8443
+
+xray_users:
+  - { uid: "E6AA699D-8642-4767-8C98-DB93F958A48B", name: "John" }
+  - { uid: "39ADD62B-B607-4C56-866F-364F4056EF83", name: "Vika" }
+  - { uid: "A1B2C3D4-E5F6-7890-1234-56789ABCDEF0", name: "Michael" }
+  - { uid: "B2C3D4E5-F678-9012-3456-789ABCDE1234", name: "Sophia" }
+  - { uid: "C3D4E5F6-7890-1234-5678-9ABCDEF12345", name: "David" }
+  - { uid: "D4E5F678-9012-3456-789A-BCDEF1234567", name: "Emma" }
+  - { uid: "E5F67890-1234-5678-9ABC-DEF123456789", name: "James" }
+  - { uid: "F6789012-3456-789A-BCDE-F123456789AB", name: "Olivia" }
+  - { uid: "67890123-4567-89AB-CDEF-123456789ABC", name: "Daniel" }
+  - { uid: "78901234-5678-9ABC-DEF1-23456789ABCD", name: "Ava" }
+
+#
+# Squid and xray users can be combined into the single list
+#
+# users:
+#   - { uid: "E6AA699D-8642-4767-8C98-DB93F958A48B", name: "John",    user:"john",    password: "ubhriufefriufgh" }
+#   - { uid: "39ADD62B-B607-4C56-866F-364F4056EF83", name: "Vika",    user:"vika",    password: "u5thu3rbfefrujfv" }
+#   - { uid: "A1B2C3D4-E5F6-7890-1234-56789ABCDEF0", name: "Michael", user:"michael", password: "ufberbredcdfcd" }
+#   - { uid: "B2C3D4E5-F678-9012-3456-789ABCDE1234", name: "Sophia",  user:"sophia",  password: "ubhriufefriufgh" }
+#   - { uid: "C3D4E5F6-7890-1234-5678-9ABCDEF12345", name: "David",   user:"david",   password: "u5thu3rbfefrujfv" }
+#
+# xray_users: "{{ users }}"
+# squid_users: "{{ users }}"
+#

@@ -1,0 +1,13 @@
+managerName: admin
+managerGroup: admin
+managerGID: 1001
+managerUID: 1001
+
+sshPort: 22
+sshPermitRootLogin: prohibit-password
+
+manager_ssh_keys: |
+  ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIETHYQaEzZ/1ThEMdewhwkffTMBtw+hkqd4gut4Oze9l my@ed
+
+root_ssh_keys: |
+  ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIETHYQaEzZ/1ThEMdewhwkffTMBtw+hkqd4gut4Oze9l my@ed
