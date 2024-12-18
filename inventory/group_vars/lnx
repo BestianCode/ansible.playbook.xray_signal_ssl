@@ -4,5 +4,5 @@ rootGroup: root
 usersHomeFolder: /home
 usersDefShell: /bin/bash
 
-mainETC: /etc
+etcDirectory: /etc
 sshServiceName: ssh
