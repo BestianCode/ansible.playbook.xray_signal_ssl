@@ -3,7 +3,11 @@ catch_default_443: false
 
 cloudflare_token: "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
 
+# Signal Proxy configuration
 signal_port: 443
+# Optional: Signal proxy plain port (non-SSL) for SSH tunneling or internal proxying
+# signal_port_plain: 18080
+# signal_host_plain: "127.0.0.1"
 
 xray_dns_name: "{{ ansible_host }}"
 xray_ssl_name: "{{ xray_dns_name }}"
@@ -18,8 +22,11 @@ squid_users:
   - { user: "user2", password: "u5thu3rbfefrujfv" }
   - { user: "user3", password: "ufberbredcdfcd" }
 
-xray_port: 8443
+# Main inbound port (optional)
+# Commented out - using extra_inbounds with Reality instead
+# xray_port: 8443
 
+# VPN Users - generate UUIDs with: uuidgen
 xray_users:
   - { uid: "E6AA699D-8642-4767-8C98-DB93F958A48B", name: "John" }
   - { uid: "39ADD62B-B607-4C56-866F-364F4056EF83", name: "Vika" }
@@ -32,15 +39,50 @@ xray_users:
   - { uid: "67890123-4567-89AB-CDEF-123456789ABC", name: "Daniel" }
   - { uid: "78901234-5678-9ABC-DEF1-23456789ABCD", name: "Ava" }
 
+# Extra inbounds configuration
+# Using VLESS-XTLS-Reality for anti-censorship
+#
+# To generate Reality keys run: xray x25519
+# To generate shortIds run: openssl rand -hex 4
+#
+# HAProxy configuration required for Reality on port 443:
+#   frontend main_443
+#       bind 0.0.0.0:443
+#       mode tcp
+#       default_backend be_xray_reality
+#
+#   backend be_xray_reality
+#       mode tcp
+#       server xray 127.0.0.1:44444 check
+#
+xray_extra_inbounds:
+  # VLESS-XTLS-Reality (recommended for anti-censorship)
+  - port: 44444
+    listen: 127.0.0.1
+    external_port: 443                    # HAProxy listens on 443
+    external_dns_name: "{{ xray_dns_name }}"
+    network: tcp
+    security: reality
+    flow: xtls-rprx-vision                # required for reality
+    reality_dest: "www.google.com:443"    # SNI destination (mimics traffic to this site)
+    reality_server_names:
+      - "www.google.com"
+    reality_private_key: "REPLACE_WITH_YOUR_PRIVATE_KEY"  # generate with: xray x25519
+    reality_public_key: "REPLACE_WITH_YOUR_PUBLIC_KEY"    # for client connection strings
+    reality_short_ids:                    # generate with: openssl rand -hex 4
+      - ""
+      - "a1b2c3d4"
+    users: "{{ xray_users }}"
+
 #
 # Squid and xray users can be combined into the single list
 #
 # users:
-#   - { uid: "E6AA699D-8642-4767-8C98-DB93F958A48B", name: "John",    user:"john",    password: "ubhriufefriufgh" }
-#   - { uid: "39ADD62B-B607-4C56-866F-364F4056EF83", name: "Vika",    user:"vika",    password: "u5thu3rbfefrujfv" }
-#   - { uid: "A1B2C3D4-E5F6-7890-1234-56789ABCDEF0", name: "Michael", user:"michael", password: "ufberbredcdfcd" }
-#   - { uid: "B2C3D4E5-F678-9012-3456-789ABCDE1234", name: "Sophia",  user:"sophia",  password: "ubhriufefriufgh" }
-#   - { uid: "C3D4E5F6-7890-1234-5678-9ABCDEF12345", name: "David",   user:"david",   password: "u5thu3rbfefrujfv" }
+#   - { uid: "E6AA699D-8642-4767-8C98-DB93F958A48B", name: "John",    user: "john",    password: "ubhriufefriufgh" }
+#   - { uid: "39ADD62B-B607-4C56-866F-364F4056EF83", name: "Vika",    user: "vika",    password: "u5thu3rbfefrujfv" }
+#   - { uid: "A1B2C3D4-E5F6-7890-1234-56789ABCDEF0", name: "Michael", user: "michael", password: "ufberbredcdfcd" }
+#   - { uid: "B2C3D4E5-F678-9012-3456-789ABCDE1234", name: "Sophia",  user: "sophia",  password: "ubhriufefriufgh" }
+#   - { uid: "C3D4E5F6-7890-1234-5678-9ABCDEF12345", name: "David",   user: "david",   password: "u5thu3rbfefrujfv" }
 #
 # xray_users: "{{ users }}"
 # squid_users: "{{ users }}"

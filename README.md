@@ -113,3 +113,102 @@ xray_users:
   - { uid: "67890123-4567-89AB-CDEF-123456789ABC", name: "Daniel" }
   - { uid: "78901234-5678-9ABC-DEF1-23456789ABCD", name: "Ava" }
 ```
+
+## Advanced: Extra Inbounds Configuration
+
+You can configure additional inbounds with different protocols and settings. This is useful for:
+- Running multiple endpoints on different ports
+- Using VLESS-XTLS-Reality for anti-censorship
+- Having different user lists per inbound
+
+### WebSocket behind reverse proxy
+
+```yaml
+xray_extra_inbounds:
+  - port: 8444
+    listen: 127.0.0.1
+    dns_name: "{{ xray_dns_name }}"
+    external_port: 443
+    external_dns_name: "vpn.example.com"
+    network: ws
+    security: none
+    path: /maps
+    users: "{{ xray_users_vip }}"
+```
+
+### VLESS-XTLS-Reality (Recommended for anti-censorship)
+
+Reality provides better obfuscation by mimicking legitimate TLS traffic to popular websites.
+
+1. Generate Reality keys:
+   ```bash
+   xray x25519
+   ```
+   This outputs both private and public keys.
+
+2. Generate shortIds:
+   ```bash
+   openssl rand -hex 4
+   ```
+
+3. Configure the inbound:
+   ```yaml
+   xray_extra_inbounds:
+     - port: 44444
+       listen: 127.0.0.1
+       external_port: 443
+       external_dns_name: "vpn.example.com"
+       network: tcp
+       security: reality
+       flow: xtls-rprx-vision
+       reality_dest: "www.google.com:443"
+       reality_server_names:
+         - "www.google.com"
+       reality_private_key: "YOUR_PRIVATE_KEY"
+       reality_public_key: "YOUR_PUBLIC_KEY"
+       reality_short_ids:
+         - ""
+         - "a1b2c3d4"
+       users: "{{ xray_users_vip }}"
+   ```
+
+4. Configure HAProxy to forward port 443 to the Reality inbound:
+   ```
+   frontend main_443
+       bind 0.0.0.0:443
+       mode tcp
+       default_backend be_xray_reality
+
+   backend be_xray_reality
+       mode tcp
+       server xray 127.0.0.1:44444 check
+   ```
+
+### Custom users per inbound
+
+Each inbound can have its own user list:
+
+```yaml
+xray_users_vip:
+  - { uid: "VIP-UUID-1", name: "VIPUser1" }
+  - { uid: "VIP-UUID-2", name: "VIPUser2" }
+
+xray_extra_inbounds:
+  - port: 8444
+    network: ws
+    security: none
+    users: "{{ xray_users_vip }}"  # Only VIP users can access this inbound
+```
+
+## Optional: Disable main inbound
+
+If you only want to use extra inbounds (e.g., Reality-only setup), comment out `xray_port`:
+
+```yaml
+# xray_port: 8443  # Commented out - no main inbound
+xray_extra_inbounds:
+  - port: 44444
+    security: reality
+    # ... reality config
+```
+
